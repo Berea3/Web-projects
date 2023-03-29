@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="favicon.png">
+    <title>X si O</title>
+</head>
+<body>
+  <div class="cont">
+    <div>
+      <button class="buton"></button>
+      <button class="buton"></button>
+      <button class="buton"></button>
+    </div>
+    <div>
+      <button class="buton"></button>
+      <button class="buton"></button>
+      <button class="buton"></button>
+    </div>
+    <div>
+      <button class="buton"></button>
+      <button class="buton"></button>
+      <button class="buton"></button>
+    </div>
+  </div>
+  <script src="/socket.io/socket.io.js"></script>
+  
+  <script>
+
+    grid=document.querySelectorAll(".buton");
+    let b=Array(2);
+    let a=Array(4);
+    k=0;
+    for (let i=1;i<=3;i++) a[i]=Array(4);
+    for (let i=1;i<=3;i++)
+    {
+      for (let j=1;j<=3;j++) a[i][j]=grid[k++];
+    }
+
+    let socket = io();
+    let player = '';
+    socket.on('connect', function() {
+      console.log('connected', socket.id);
+    });
+    socket.on('start', game => {
+      player = game[socket.id];
+      console.log('start', player);
+    });
+
+    
+
+    for (let i=1;i<=3;i++)
+    {
+      for (let j=1;j<=3;j++)
+      {
+        a[i][j].addEventListener('click',()=>{
+          console.log(i,j);
+          socket.emit('click',[i,j,player]);
+        });
+      }
+    }
+
+    socket.on('bifa',bifeaza);
+    function bifeaza(b)
+    {
+      a[b[0]][b[1]].textContent=b[2];
+    }
+
+    socket.on('win',finish);
+    function finish(who)
+    {
+      setTimeout(function()
+      {
+          alert(who+' won');
+          location.reload();
+      },25)
+    }
+
+    socket.on('draw',draw);
+    function draw(yea)
+    {
+      setTimeout(function()
+      {
+        alert('draw');
+        location.reload();
+      },25)
+    }
+  </script>
+
+  <style>
+  *{
+    margin: 0;
+    padding: 0;
+  }
+
+  .cont{
+    width: fit-content;
+    margin: 50vh auto;
+    transform: translateY(-50%);
+  }
+
+  button{
+      width: 3rem;
+      height: 3rem;
+      vertical-align: middle;
+  }
+  </style>
+</body>
+</html>
